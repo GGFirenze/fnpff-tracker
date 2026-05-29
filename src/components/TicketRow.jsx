@@ -142,7 +142,7 @@ function ExpandedDetails({ ticket, onUpdate, onDelete }) {
             ) : (
               <span className="text-gray-800 text-xs cursor-pointer hover:text-blue-600"
                 onClick={e => { e.stopPropagation(); setPmEdit(true) }}>
-                {ticket.pm_owner || 'None'} <span className="text-blue-500 text-[10px]">edit</span>
+                {ticket.pm_owner === 'None' ? 'Pending assignment' : ticket.pm_owner} <span className="text-blue-500 text-[10px]">edit</span>
               </span>
             )}
           </div>
@@ -241,16 +241,20 @@ function StatusBadge({ value, onClick, editable }) {
     'Open': 'bg-red-100 text-red-700',
     'Fixed': 'bg-green-100 text-green-700',
     'Done': 'bg-green-100 text-green-700',
-    'Closed': 'bg-gray-100 text-gray-600',
+    'Closed': 'bg-gray-100 text-gray-500',
     'Resolved': 'bg-green-100 text-green-700',
     'On Hold': 'bg-yellow-100 text-yellow-700',
     'In Engineering': 'bg-blue-100 text-blue-700',
     'Unprocessed': 'bg-orange-100 text-orange-700',
   }
+  const displayLabels = {
+    'Closed': 'Logged internally',
+    'Unprocessed': 'Under review',
+  }
   return (
     <span onClick={editable ? onClick : undefined}
       className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors[value] || 'bg-gray-100 text-gray-600'} ${editable ? 'cursor-pointer hover:ring-2 hover:ring-blue-300' : ''}`}>
-      {value}
+      {displayLabels[value] || value}
     </span>
   )
 }
@@ -259,12 +263,17 @@ function PbStatusBadge({ value, onClick, editable }) {
   const colors = {
     'Unprocessed': 'bg-orange-100 text-orange-700',
     'Processed': 'bg-green-100 text-green-700',
-    'Not Logged': 'bg-red-100 text-red-700',
+    'Not Logged': 'bg-gray-100 text-gray-500',
+  }
+  const displayLabels = {
+    'Unprocessed': 'Under review',
+    'Not Logged': 'Pending',
+    'Processed': 'Processed',
   }
   return (
     <span onClick={editable ? onClick : undefined}
       className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors[value] || 'bg-gray-100 text-gray-600'} ${editable ? 'cursor-pointer hover:ring-2 hover:ring-blue-300' : ''}`}>
-      {value}
+      {displayLabels[value] || value}
     </span>
   )
 }
