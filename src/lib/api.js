@@ -68,6 +68,28 @@ export async function getAuditLog(limit = 50) {
   }
 }
 
+export async function createTicket(ticketData) {
+  try {
+    return { data: await apiFetch('tickets', {
+      method: 'POST',
+      body: JSON.stringify(ticketData),
+    })}
+  } catch (error) {
+    return { error: error.message }
+  }
+}
+
+export async function deleteTicket(id) {
+  try {
+    return await apiFetch('tickets', {
+      method: 'DELETE',
+      body: JSON.stringify({ id }),
+    })
+  } catch (error) {
+    return { error: error.message }
+  }
+}
+
 export async function seedDatabase() {
   try {
     return await apiFetch('seed', { method: 'POST' })

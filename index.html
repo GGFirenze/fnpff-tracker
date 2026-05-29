@@ -5,6 +5,25 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fressnapf Support Tracker</title>
+    <script src="https://cdn.amplitude.com/script/f3f5022f5f9d4153c3fac10ada44436f.js"></script>
+    <script src="https://cdn.amplitude.com/script/f3f5022f5f9d4153c3fac10ada44436f.engagement.js"></script>
+    <script>
+      window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1}));
+      window.amplitude.add(window.engagement.plugin());
+      window.amplitude.init('f3f5022f5f9d4153c3fac10ada44436f', {
+        fetchRemoteConfig: true,
+        autocapture: {
+          attribution: true,
+          pageViews: true,
+          sessions: false,
+          formInteractions: false,
+          fileDownloads: false,
+          elementInteractions: false,
+          webVitals: true,
+          frustrationInteractions: true
+        }
+      });
+    </script>
   </head>
   <body class="bg-gray-50 min-h-screen">
     <div id="root"></div>

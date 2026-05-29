@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import TicketRow from './TicketRow'
 
-export default function TicketTable({ tickets, onUpdate }) {
+export default function TicketTable({ tickets, onUpdate, onDelete }) {
   const [sortField, setSortField] = useState('id')
   const [sortDir, setSortDir] = useState('asc')
 
@@ -58,7 +58,7 @@ export default function TicketTable({ tickets, onUpdate }) {
           </thead>
           <tbody>
             {sorted.map(ticket => (
-              <TicketRow key={ticket.id} ticket={ticket} onUpdate={onUpdate} />
+              <TicketRow key={ticket.id} ticket={ticket} onUpdate={onUpdate} onDelete={onDelete} />
             ))}
           </tbody>
         </table>

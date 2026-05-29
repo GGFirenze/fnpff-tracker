@@ -1,3 +1,5 @@
+import { track } from '../lib/analytics'
+
 export default function Filters({ filters, setFilters }) {
   const statusOptions = ['Open', 'Fixed', 'Done']
   const classificationOptions = ['Bug', 'FR', 'Product limitation']
@@ -5,6 +7,7 @@ export default function Filters({ filters, setFilters }) {
   const pbStatusOptions = ['Unprocessed', 'Processed', 'Not Logged']
 
   const toggleFilter = (category, value) => {
+    track('filter_clicked', { filter_name: category, filter_value: value })
     setFilters(prev => {
       const current = prev[category] || []
       const next = current.includes(value)

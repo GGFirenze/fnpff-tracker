@@ -5,7 +5,9 @@ import Filters from './components/Filters'
 import TicketTable from './components/TicketTable'
 import ExportButton from './components/ExportButton'
 import AuditLog from './components/AuditLog'
-import { getTickets, updateTicket, logAuditEntry } from './lib/api'
+import AddTicketForm from './components/AddTicketForm'
+import { getTickets, updateTicket, logAuditEntry, createTicket, deleteTicket } from './lib/api'
+import { track } from './lib/analytics'
 import { SEED_TICKETS } from './lib/data'
 
 export default function App() {
@@ -14,6 +16,7 @@ export default function App() {
   const [filters, setFilters] = useState({ status: [], classification: [], pillar: [], pbStatus: [] })
   const [loading, setLoading] = useState(true)
   const [auditRefresh, setAuditRefresh] = useState(0)
+  const [showAddForm, setShowAddForm] = useState(false)
 
   useEffect(() => {
     if (authed) {
@@ -38,8 +41,29 @@ export default function App() {
       new_value: newValue,
       changed_by: 'user',
     })
+    track('ticket_updated', { ticket_id: id, field, new_value: newValue })
     setAuditRefresh(prev => prev + 1)
   }, [])
+
+  const handleAdd = useCallback(async (ticketData) => {
+    const result = await createTicket(ticketData)
+    if (result.data) {
+      setTickets(prev => [...prev, result.data])
+      track('ticket_created', { topic: ticketData.topic })
+      setShowAddForm(false)
+    }
+    return result
+  }, [])
+
+  const handleDelete = useCallback(async (id) => {
+    const ticket = tickets.find(t => t.id === id)
+    const result = await deleteTicket(id)
+    if (!result.error) {
+      setTickets(prev => prev.filter(t => t.id !== id))
+      track('ticket_deleted', { ticket_id: id, topic: ticket?.topic })
+    }
+    return result
+  }, [tickets])
 
   const filteredTickets = tickets.filter(t => {
     if (filters.status.length && !filters.status.includes(t.fressnapf_status)) return false
@@ -60,9 +84,15 @@ export default function App() {
             <p className="text-sm text-gray-500">Shared issue visibility — Amplitude & Fressnapf</p>
           </div>
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              + Add Ticket
+            </button>
             <ExportButton tickets={filteredTickets} />
             <button
-              onClick={() => { sessionStorage.removeItem('fressnapf-auth'); setAuthed(false) }}
+              onClick={() => { sessionStorage.removeItem('fressnapf-auth'); sessionStorage.removeItem('fressnapf-token'); setAuthed(false) }}
               className="px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700"
             >
               Logout
@@ -83,11 +113,15 @@ export default function App() {
                 Showing {filteredTickets.length} of {tickets.length} tickets
               </span>
             </div>
-            <TicketTable tickets={filteredTickets} onUpdate={handleUpdate} />
+            <TicketTable tickets={filteredTickets} onUpdate={handleUpdate} onDelete={handleDelete} />
             <AuditLog refreshTrigger={auditRefresh} />
           </>
         )}
       </main>
+
+      {showAddForm && (
+        <AddTicketForm onSubmit={handleAdd} onClose={() => setShowAddForm(false)} />
+      )}
     </div>
   )
 }
