@@ -8,7 +8,7 @@ import AuditLog from './components/AuditLog'
 import AddTicketForm from './components/AddTicketForm'
 import { getTickets, updateTicket, logAuditEntry, createTicket, deleteTicket } from './lib/api'
 import { track } from './lib/analytics'
-import { SEED_TICKETS, MAX_P0 } from './lib/data'
+import { SEED_TICKETS, MAX_P0, sectionOf, SECTION_LABEL } from './lib/data'
 
 export default function App() {
   const [authed, setAuthed] = useState(() => sessionStorage.getItem('fressnapf-auth') === 'true')
@@ -32,9 +32,11 @@ export default function App() {
 
   const handleUpdate = useCallback(async (id, field, newValue, oldValue) => {
     if (field === 'priority' && newValue === 'P0') {
-      const otherP0 = tickets.filter(t => t.priority === 'P0' && t.id !== id).length
+      const target = tickets.find(t => t.id === id)
+      const section = sectionOf(target)
+      const otherP0 = tickets.filter(t => t.priority === 'P0' && t.id !== id && sectionOf(t) === section).length
       if (otherP0 >= MAX_P0) {
-        setCapWarning(`Only ${MAX_P0} items can be P0 at once — downgrade another before promoting this one (currently ${otherP0} at P0).`)
+        setCapWarning(`Only ${MAX_P0} ${SECTION_LABEL[section]} can be P0 at once — downgrade another before promoting this one (currently ${otherP0} at P0).`)
         return
       }
     }

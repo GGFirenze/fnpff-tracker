@@ -1,10 +1,12 @@
-import { MAX_P0 } from '../lib/data'
+import { MAX_P0, sectionOf } from '../lib/data'
 import { track } from '../lib/analytics'
 
 export default function TopPriorities({ tickets }) {
   const p0 = tickets.filter(t => t.priority === 'P0')
   const p1 = tickets.filter(t => t.priority === 'P1')
   const needsTriage = tickets.filter(t => !t.priority || t.priority === 'Unassigned').length
+  const frP0 = p0.filter(t => sectionOf(t) === 'fr').length
+  const bugP0 = p0.filter(t => sectionOf(t) === 'bugs').length
   const top = [...p0, ...p1]
 
   return (
@@ -13,8 +15,11 @@ export default function TopPriorities({ tickets }) {
         <h2 className="text-sm font-semibold text-gray-800">Top Priorities</h2>
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
           <span>{tickets.length} total</span>
-          <span className={p0.length > MAX_P0 ? 'text-red-600 font-semibold' : 'text-red-600'}>
-            P0 {p0.length}/{MAX_P0}
+          <span className={frP0 > MAX_P0 ? 'text-red-600 font-semibold' : 'text-red-600'}>
+            FR P0 {frP0}/{MAX_P0}
+          </span>
+          <span className={bugP0 > MAX_P0 ? 'text-red-600 font-semibold' : 'text-red-600'}>
+            Bug P0 {bugP0}/{MAX_P0}
           </span>
           <span className="text-orange-600">P1 {p1.length}</span>
           <span>{needsTriage} need triage</span>

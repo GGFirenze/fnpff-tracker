@@ -4,9 +4,14 @@
 const zd = (id) => `https://amplitude.zendesk.com/agent/tickets/${id}`
 
 // Priority scale (customer-owned) and the hard cap on P0 ("make or break")
-// items — the guardrail that stops everything being flagged critical.
+// items — the guardrail that stops everything being flagged critical. The cap
+// applies PER SECTION: up to MAX_P0 feature requests AND up to MAX_P0 bugs.
 export const PRIORITY_OPTIONS = ['P0', 'P1', 'P2', 'P3', 'Unassigned']
 export const MAX_P0 = 3
+
+// Which section a ticket belongs to — Feature Requests vs Bugs & Issues.
+export const sectionOf = (t) => (t.classification === 'FR' ? 'fr' : 'bugs')
+export const SECTION_LABEL = { fr: 'feature requests', bugs: 'bugs & issues' }
 
 export const SEED_TICKETS = [
   // --- Part 1: Feature Requests ---
