@@ -73,6 +73,9 @@ export default function App() {
     return true
   })
 
+  const featureRequests = filteredTickets.filter(t => t.classification === 'FR')
+  const bugsAndIssues = filteredTickets.filter(t => t.classification === 'Bug' || t.classification === 'Product limitation')
+
   if (!authed) return <Login onAuth={setAuthed} />
 
   return (
@@ -113,8 +116,25 @@ export default function App() {
                 Showing {filteredTickets.length} of {tickets.length} tickets
               </span>
             </div>
-            <TicketTable tickets={filteredTickets} onUpdate={handleUpdate} onDelete={handleDelete} />
-            <AuditLog refreshTrigger={auditRefresh} />
+            <div className="space-y-6">
+              <TicketTable
+                title="💡 Feature Requests"
+                tickets={featureRequests}
+                onUpdate={handleUpdate}
+                onDelete={handleDelete}
+                emptyLabel="No feature requests match the current filters."
+              />
+              <TicketTable
+                title="🐞 Bugs & Issues"
+                tickets={bugsAndIssues}
+                onUpdate={handleUpdate}
+                onDelete={handleDelete}
+                emptyLabel="No bugs or issues match the current filters."
+              />
+            </div>
+            <div className="mt-6">
+              <AuditLog refreshTrigger={auditRefresh} />
+            </div>
           </>
         )}
       </main>

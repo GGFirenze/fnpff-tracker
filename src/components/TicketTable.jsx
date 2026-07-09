@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import TicketRow from './TicketRow'
 
-export default function TicketTable({ tickets, onUpdate, onDelete }) {
+export default function TicketTable({ tickets, onUpdate, onDelete, title, emptyLabel }) {
   const [sortField, setSortField] = useState('id')
   const [sortDir, setSortDir] = useState('asc')
 
@@ -35,6 +35,12 @@ export default function TicketTable({ tickets, onUpdate, onDelete }) {
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      {title && (
+        <div className="flex items-center justify-between px-4 py-2.5 bg-gray-50/80 border-b border-gray-200">
+          <h2 className="text-sm font-semibold text-gray-800">{title}</h2>
+          <span className="text-xs text-gray-500">{tickets.length}</span>
+        </div>
+      )}
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -65,7 +71,7 @@ export default function TicketTable({ tickets, onUpdate, onDelete }) {
       </div>
       {tickets.length === 0 && (
         <div className="p-8 text-center text-gray-500">
-          No tickets match the current filters.
+          {emptyLabel || 'No tickets match the current filters.'}
         </div>
       )}
     </div>
