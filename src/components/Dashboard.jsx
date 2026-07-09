@@ -1,13 +1,19 @@
+import { MAX_P0 } from '../lib/data'
+
 export default function Dashboard({ tickets }) {
   const total = tickets.length
   const openCount = tickets.filter(t => t.fressnapf_status === 'Open').length
   const fixedCount = tickets.filter(t => t.fressnapf_status === 'Fixed').length
   const onHoldCount = tickets.filter(t => t.amplitude_status === 'On Hold').length
   const inProgressCount = tickets.filter(t => t.amplitude_status === 'In Engineering').length
+  const p0Count = tickets.filter(t => t.priority === 'P0').length
+  const unassignedCount = tickets.filter(t => !t.priority || t.priority === 'Unassigned').length
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
       <StatCard label="Total Tickets" value={total} color="gray" />
+      <StatCard label="P0 · Critical" value={`${p0Count}/${MAX_P0}`} color={p0Count > MAX_P0 ? 'red' : 'orange'} subtitle="make-or-break cap" />
+      <StatCard label="Needs triage" value={unassignedCount} color="gray" subtitle="no priority set" />
       <StatCard label="Open" value={openCount} color="red" />
       <StatCard label="In Progress" value={inProgressCount} color="blue" />
       <StatCard label="On Hold" value={onHoldCount} color="yellow" />

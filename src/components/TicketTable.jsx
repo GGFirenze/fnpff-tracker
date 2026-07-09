@@ -27,6 +27,7 @@ export default function TicketTable({ tickets, onUpdate, onDelete, title, emptyL
     { key: 'id', label: '#', width: 'w-12' },
     { key: 'topic', label: 'Topic', width: 'w-64' },
     { key: 'classification', label: 'Type', width: 'w-28' },
+    { key: 'priority', label: 'Priority', width: 'w-24' },
     { key: 'fressnapf_status', label: 'Fressnapf', width: 'w-24' },
     { key: 'amplitude_status', label: 'Amplitude', width: 'w-28' },
     { key: 'pillar', label: 'Pillar', width: 'w-28' },

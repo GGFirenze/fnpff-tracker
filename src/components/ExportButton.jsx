@@ -4,10 +4,10 @@ export default function ExportButton({ tickets }) {
   const [copied, setCopied] = useState(false)
 
   const exportMarkdown = () => {
-    const header = '| # | Topic | Type | Fressnapf | Amplitude | Pillar | PB Status |'
-    const separator = '|---|-------|------|-----------|-----------|--------|-----------|'
+    const header = '| # | Topic | Type | Priority | Fressnapf | Amplitude | Pillar | PB Status |'
+    const separator = '|---|-------|------|----------|-----------|-----------|--------|-----------|'
     const rows = tickets.map(t =>
-      `| ${t.id} | ${t.topic} | ${t.classification} | ${t.fressnapf_status} | ${t.amplitude_status} | ${t.pillar} | ${t.productboard_status} |`
+      `| ${t.id} | ${t.topic} | ${t.classification} | ${t.priority || 'Unassigned'} | ${t.fressnapf_status} | ${t.amplitude_status} | ${t.pillar} | ${t.productboard_status} |`
     )
 
     const markdown = [header, separator, ...rows].join('\n')

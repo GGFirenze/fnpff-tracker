@@ -30,8 +30,8 @@ export default async function handler(req, res) {
       const newId = maxId.rows[0].max_id + 1
 
       await db.execute({
-        sql: `INSERT INTO tickets (id, topic, summary, classification, fressnapf_status, amplitude_status, zendesk_ticket_id, zendesk_url, productboard_note_id, productboard_url, productboard_status, pm_owner, pillar, reporter, created_date, notes, engineering_ref, last_updated)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
+        sql: `INSERT INTO tickets (id, topic, summary, classification, fressnapf_status, amplitude_status, priority, zendesk_ticket_id, zendesk_url, productboard_note_id, productboard_url, productboard_status, pm_owner, pillar, reporter, created_date, notes, engineering_ref, last_updated)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
         args: [
           newId,
           data.topic,
@@ -39,6 +39,7 @@ export default async function handler(req, res) {
           data.classification || 'FR',
           data.fressnapf_status || 'Open',
           data.amplitude_status || 'Unprocessed',
+          data.priority || 'Unassigned',
           data.zendesk_ticket_id || null,
           data.zendesk_url || null,
           data.productboard_note_id || null,
@@ -67,7 +68,7 @@ export default async function handler(req, res) {
     }
 
     const allowedFields = ['topic', 'summary', 'classification', 'fressnapf_status', 'amplitude_status',
-      'zendesk_ticket_id', 'zendesk_url', 'productboard_note_id', 'productboard_url',
+      'priority', 'zendesk_ticket_id', 'zendesk_url', 'productboard_note_id', 'productboard_url',
       'productboard_status', 'pm_owner', 'pillar', 'reporter', 'notes', 'engineering_ref']
 
     const fields = Object.keys(updates).filter(f => allowedFields.includes(f))

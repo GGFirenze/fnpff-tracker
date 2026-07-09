@@ -3,6 +3,11 @@
 // ("Fressnapf_Requests_and_Bugs", 09 Jul 2026). Part 1 = FRs, Part 2 = Bugs.
 const zd = (id) => `https://amplitude.zendesk.com/agent/tickets/${id}`
 
+// Priority scale (customer-owned) and the hard cap on P0 ("make or break")
+// items — the guardrail that stops everything being flagged critical.
+export const PRIORITY_OPTIONS = ['P0', 'P1', 'P2', 'P3', 'Unassigned']
+export const MAX_P0 = 3
+
 export const SEED_TICKETS = [
   // --- Part 1: Feature Requests ---
   {

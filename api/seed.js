@@ -11,6 +11,7 @@ CREATE TABLE tickets (
   classification TEXT NOT NULL,
   fressnapf_status TEXT NOT NULL DEFAULT 'Open',
   amplitude_status TEXT NOT NULL DEFAULT 'Unprocessed',
+  priority TEXT NOT NULL DEFAULT 'Unassigned',
   zendesk_ticket_id TEXT,
   zendesk_url TEXT,
   productboard_note_id TEXT,

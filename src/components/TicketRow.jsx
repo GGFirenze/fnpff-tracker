@@ -34,6 +34,7 @@ export default function TicketRow({ ticket, onUpdate, onDelete }) {
   const statusOptions = ['Open', 'Fixed', 'Done']
   const amplitudeStatusOptions = ['Unprocessed', 'In Engineering', 'On Hold', 'Closed', 'Resolved', 'Open']
   const pbStatusOptions = ['Not Logged', 'Unprocessed', 'Processed']
+  const priorityOptions = ['P0', 'P1', 'P2', 'P3', 'Unassigned']
 
   return (
     <>
@@ -45,6 +46,18 @@ export default function TicketRow({ ticket, onUpdate, onDelete }) {
         <td className="px-3 py-3 font-medium text-gray-900">{ticket.topic}</td>
         <td className="px-3 py-3">
           <ClassificationBadge value={ticket.classification} />
+        </td>
+        <td className="px-3 py-3">
+          {editing === 'priority' ? (
+            <select value={editValue} onChange={e => setEditValue(e.target.value)}
+              onBlur={() => saveEdit('priority')} onClick={e => e.stopPropagation()}
+              className="text-xs border rounded px-1 py-0.5" autoFocus>
+              {priorityOptions.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          ) : (
+            <PriorityBadge value={ticket.priority}
+              onClick={e => startEdit('priority', ticket.priority || 'Unassigned', e)} editable />
+          )}
         </td>
         <td className="px-3 py-3">
           {editing === 'fressnapf_status' ? (
@@ -89,7 +102,7 @@ export default function TicketRow({ ticket, onUpdate, onDelete }) {
       </tr>
       {expanded && (
         <tr className={rowColor}>
-          <td colSpan="8" className="px-6 py-4">
+          <td colSpan="9" className="px-6 py-4">
             <ExpandedDetails ticket={ticket} onUpdate={onUpdate} onDelete={onDelete} />
           </td>
         </tr>
@@ -220,6 +233,24 @@ function DetailRow({ label, value }) {
       <span className="text-gray-500 text-xs font-medium">{label}:</span>{' '}
       <span className="text-gray-800 text-xs">{value || '—'}</span>
     </div>
+  )
+}
+
+function PriorityBadge({ value, onClick, editable }) {
+  const v = value || 'Unassigned'
+  const colors = {
+    'P0': 'bg-red-100 text-red-700 ring-1 ring-red-300',
+    'P1': 'bg-orange-100 text-orange-700',
+    'P2': 'bg-yellow-100 text-yellow-700',
+    'P3': 'bg-gray-100 text-gray-600',
+    'Unassigned': 'bg-white text-gray-400 border border-dashed border-gray-300',
+  }
+  const labels = { 'Unassigned': 'Set priority' }
+  return (
+    <span onClick={editable ? onClick : undefined}
+      className={`px-2 py-0.5 rounded-full text-xs font-semibold ${colors[v] || colors['Unassigned']} ${editable ? 'cursor-pointer hover:ring-2 hover:ring-blue-300' : ''}`}>
+      {labels[v] || v}
+    </span>
   )
 }
 

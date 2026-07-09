@@ -5,6 +5,7 @@ export default function Filters({ filters, setFilters }) {
   const classificationOptions = ['Bug', 'FR', 'Product limitation']
   const pillarOptions = ['Governance', 'Analytics', 'Data Management']
   const pbStatusOptions = ['Unprocessed', 'Processed', 'Not Logged']
+  const priorityOptions = ['P0', 'P1', 'P2', 'P3', 'Unassigned']
 
   const toggleFilter = (category, value) => {
     track('filter_clicked', { filter_name: category, filter_value: value })
@@ -18,7 +19,7 @@ export default function Filters({ filters, setFilters }) {
   }
 
   const clearAll = () => {
-    setFilters({ status: [], classification: [], pillar: [], pbStatus: [] })
+    setFilters({ status: [], classification: [], pillar: [], pbStatus: [], priority: [] })
   }
 
   const hasFilters = Object.values(filters).some(arr => arr.length > 0)
@@ -36,7 +37,13 @@ export default function Filters({ filters, setFilters }) {
           </button>
         )}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <FilterGroup
+          label="Priority"
+          options={priorityOptions}
+          selected={filters.priority}
+          onToggle={(val) => toggleFilter('priority', val)}
+        />
         <FilterGroup
           label="Fressnapf Status"
           options={statusOptions}

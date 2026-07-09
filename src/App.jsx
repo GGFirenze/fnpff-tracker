@@ -8,16 +8,17 @@ import AuditLog from './components/AuditLog'
 import AddTicketForm from './components/AddTicketForm'
 import { getTickets, updateTicket, logAuditEntry, createTicket, deleteTicket } from './lib/api'
 import { track } from './lib/analytics'
-import { SEED_TICKETS } from './lib/data'
+import { SEED_TICKETS, MAX_P0 } from './lib/data'
 
 export default function App() {
   const [authed, setAuthed] = useState(() => sessionStorage.getItem('fressnapf-auth') === 'true')
   const [tickets, setTickets] = useState(SEED_TICKETS)
-  const [filters, setFilters] = useState({ status: [], classification: [], pillar: [], pbStatus: [] })
+  const [filters, setFilters] = useState({ status: [], classification: [], pillar: [], pbStatus: [], priority: [] })
   const [loading, setLoading] = useState(true)
   const [auditRefresh, setAuditRefresh] = useState(0)
   const [showAddForm, setShowAddForm] = useState(false)
   const [view, setView] = useState('fr')
+  const [capWarning, setCapWarning] = useState('')
 
   useEffect(() => {
     if (authed) {
@@ -30,6 +31,15 @@ export default function App() {
   }, [authed])
 
   const handleUpdate = useCallback(async (id, field, newValue, oldValue) => {
+    if (field === 'priority' && newValue === 'P0') {
+      const otherP0 = tickets.filter(t => t.priority === 'P0' && t.id !== id).length
+      if (otherP0 >= MAX_P0) {
+        setCapWarning(`Only ${MAX_P0} items can be P0 at once — downgrade another before promoting this one (currently ${otherP0} at P0).`)
+        return
+      }
+    }
+    setCapWarning('')
+
     setTickets(prev => prev.map(t =>
       t.id === id ? { ...t, [field]: newValue, last_updated: new Date().toISOString() } : t
     ))
@@ -44,7 +54,7 @@ export default function App() {
     })
     track('ticket_updated', { ticket_id: id, field, new_value: newValue })
     setAuditRefresh(prev => prev + 1)
-  }, [])
+  }, [tickets])
 
   const handleAdd = useCallback(async (ticketData) => {
     const result = await createTicket(ticketData)
@@ -71,6 +81,7 @@ export default function App() {
     if (filters.classification.length && !filters.classification.includes(t.classification)) return false
     if (filters.pillar.length && !filters.pillar.includes(t.pillar)) return false
     if (filters.pbStatus.length && !filters.pbStatus.includes(t.productboard_status)) return false
+    if (filters.priority.length && !filters.priority.includes(t.priority || 'Unassigned')) return false
     return true
   })
 
@@ -112,6 +123,12 @@ export default function App() {
           <>
             <Dashboard tickets={tickets} />
             <Filters filters={filters} setFilters={setFilters} />
+            {capWarning && (
+              <div className="mb-4 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+                <span>🔴 {capWarning}</span>
+                <button onClick={() => setCapWarning('')} className="text-red-400 hover:text-red-600">✕</button>
+              </div>
+            )}
             <ViewToggle view={view} setView={setView} frCount={featureRequests.length} bugCount={bugsAndIssues.length} />
             <div className="space-y-6">
               {view !== 'bugs' && (
