@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import Login from './components/Login'
-import Dashboard from './components/Dashboard'
+import TopPriorities from './components/TopPriorities'
 import Filters from './components/Filters'
 import TicketTable from './components/TicketTable'
 import ExportButton from './components/ExportButton'
@@ -121,7 +121,7 @@ export default function App() {
           <div className="text-center py-12 text-gray-500">Loading tickets...</div>
         ) : (
           <>
-            <Dashboard tickets={tickets} />
+            <TopPriorities tickets={tickets} />
             <Filters filters={filters} setFilters={setFilters} />
             {capWarning && (
               <div className="mb-4 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
