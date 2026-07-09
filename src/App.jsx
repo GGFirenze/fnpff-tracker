@@ -17,7 +17,7 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [auditRefresh, setAuditRefresh] = useState(0)
   const [showAddForm, setShowAddForm] = useState(false)
-  const [view, setView] = useState('all')
+  const [view, setView] = useState('fr')
 
   useEffect(() => {
     if (authed) {
