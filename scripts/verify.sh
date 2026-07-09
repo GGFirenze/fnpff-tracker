@@ -40,7 +40,7 @@ else
   exit 1
 fi
 
-# 2) tickets (needs Turso env vars)
+# 2) tickets (needs Turso env vars + the tables to exist)
 code=$(status "${AUTH[@]}" "$BASE/api/tickets")
 if [[ "$code" == "200" ]]; then
   count=$(grep -o '"id"' /tmp/fnpff_body.txt | wc -l | tr -d ' ')
@@ -48,8 +48,10 @@ if [[ "$code" == "200" ]]; then
   TICKETS_OK=1
 else
   echo "❌ /api/tickets     $code  — $(head -c 200 /tmp/fnpff_body.txt)"
-  echo "   The Turso env vars (TURSO_DATABASE_URL / TURSO_AUTH_TOKEN) are"
-  echo "   almost certainly missing or wrong in Vercel. Add them, redeploy, re-run."
+  echo "   The env vars ARE set, so this is usually one of:"
+  echo "     a) the tables were never created  → run:  ./scripts/verify.sh --seed"
+  echo "     b) the Turso DB is paused (free-tier idle) → resume it in app.turso.tech"
+  echo "     c) the URL/token pair is stale/mismatched → regenerate token, redeploy"
   TICKETS_OK=0
   count=0
 fi
@@ -63,15 +65,20 @@ if [[ "${TICKETS_OK:-0}" == "1" && "$count" == "0" ]]; then
   echo "Board is empty. Seed it with:  ./scripts/verify.sh --seed"
 fi
 
-# 4) optional seed
+# 4) optional seed — only needs auth/DB connection; it CREATES the tables,
+# so it is allowed even when /api/tickets 500s because the table is missing.
 if [[ "${1:-}" == "--seed" ]]; then
-  if [[ "${TICKETS_OK:-0}" != "1" ]]; then
-    echo "Refusing to seed — /api/tickets is not healthy yet."
-    exit 1
-  fi
   echo
-  read -r -p "This DROPS and recreates the tables, loading 12 seed tickets. Continue? [y/N] " yn
+  echo "Seeding creates the tables and loads the 12 baseline tickets."
+  echo "It DROPS any existing tickets/audit_log tables first."
+  read -r -p "Continue? [y/N] " yn
   [[ "$yn" == "y" || "$yn" == "Y" ]] || { echo "Aborted."; exit 0; }
   code=$(status -X POST "${AUTH[@]}" "$BASE/api/seed")
   echo "seed → HTTP $code: $(cat /tmp/fnpff_body.txt)"
+  if [[ "$code" == "200" || "$code" == "201" ]]; then
+    echo "✅ Seeded. Re-run ./scripts/verify.sh to confirm the board is live."
+  else
+    echo "❌ Seed failed — if this is a DB-connection error, the Turso URL/token"
+    echo "   is stale or the DB is paused (not a missing-table problem)."
+  fi
 fi
