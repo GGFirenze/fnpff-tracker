@@ -17,6 +17,7 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [auditRefresh, setAuditRefresh] = useState(0)
   const [showAddForm, setShowAddForm] = useState(false)
+  const [view, setView] = useState('all')
 
   useEffect(() => {
     if (authed) {
@@ -111,26 +112,26 @@ export default function App() {
           <>
             <Dashboard tickets={tickets} />
             <Filters filters={filters} setFilters={setFilters} />
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm text-gray-500">
-                Showing {filteredTickets.length} of {tickets.length} tickets
-              </span>
-            </div>
+            <ViewToggle view={view} setView={setView} frCount={featureRequests.length} bugCount={bugsAndIssues.length} />
             <div className="space-y-6">
-              <TicketTable
-                title="💡 Feature Requests"
-                tickets={featureRequests}
-                onUpdate={handleUpdate}
-                onDelete={handleDelete}
-                emptyLabel="No feature requests match the current filters."
-              />
-              <TicketTable
-                title="🐞 Bugs & Issues"
-                tickets={bugsAndIssues}
-                onUpdate={handleUpdate}
-                onDelete={handleDelete}
-                emptyLabel="No bugs or issues match the current filters."
-              />
+              {view !== 'bugs' && (
+                <TicketTable
+                  title="💡 Feature Requests"
+                  tickets={featureRequests}
+                  onUpdate={handleUpdate}
+                  onDelete={handleDelete}
+                  emptyLabel="No feature requests match the current filters."
+                />
+              )}
+              {view !== 'fr' && (
+                <TicketTable
+                  title="🐞 Bugs & Issues"
+                  tickets={bugsAndIssues}
+                  onUpdate={handleUpdate}
+                  onDelete={handleDelete}
+                  emptyLabel="No bugs or issues match the current filters."
+                />
+              )}
             </div>
             <div className="mt-6">
               <AuditLog refreshTrigger={auditRefresh} />
@@ -142,6 +143,40 @@ export default function App() {
       {showAddForm && (
         <AddTicketForm onSubmit={handleAdd} onClose={() => setShowAddForm(false)} />
       )}
+    </div>
+  )
+}
+
+function ViewToggle({ view, setView, frCount, bugCount }) {
+  const options = [
+    { id: 'all', label: 'All', count: frCount + bugCount },
+    { id: 'fr', label: '💡 Feature Requests', count: frCount },
+    { id: 'bugs', label: '🐞 Bugs & Issues', count: bugCount },
+  ]
+
+  const select = (id) => {
+    setView(id)
+    track('view_toggled', { view: id })
+  }
+
+  return (
+    <div className="inline-flex items-center gap-1 mb-4 bg-white border border-gray-200 rounded-lg p-1">
+      {options.map(opt => (
+        <button
+          key={opt.id}
+          onClick={() => select(opt.id)}
+          className={`px-3 py-1.5 text-sm rounded-md font-medium transition-colors ${
+            view === opt.id
+              ? 'bg-blue-600 text-white'
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
+        >
+          {opt.label}
+          <span className={`ml-1.5 text-xs ${view === opt.id ? 'text-blue-100' : 'text-gray-400'}`}>
+            {opt.count}
+          </span>
+        </button>
+      ))}
     </div>
   )
 }
