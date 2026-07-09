@@ -3,7 +3,12 @@ import { getDb, authCheck, unauthorized } from './_db.js'
 export default async function handler(req, res) {
   if (!authCheck(req)) return unauthorized(res)
 
-  const db = getDb()
+  let db
+  try {
+    db = getDb()
+  } catch (error) {
+    return res.status(500).json({ error: `DB init failed: ${error.message}` })
+  }
 
   if (req.method === 'GET') {
     const limit = parseInt(req.query.limit) || 50
