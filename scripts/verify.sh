@@ -69,7 +69,7 @@ fi
 # so it is allowed even when /api/tickets 500s because the table is missing.
 if [[ "${1:-}" == "--seed" ]]; then
   echo
-  echo "Seeding creates the tables and loads the 12 baseline tickets."
+  echo "Seeding creates the tables and loads the baseline ticket set from api/seed.js."
   echo "It DROPS any existing tickets/audit_log tables first."
   read -r -p "Continue? [y/N] " yn
   [[ "$yn" == "y" || "$yn" == "Y" ]] || { echo "Aborted."; exit 0; }
