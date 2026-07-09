@@ -7,8 +7,10 @@ import { createClient } from '@libsql/client/web'
 let db = null
 
 export function getDb() {
-  const url = process.env.TURSO_DATABASE_URL
-  const authToken = process.env.TURSO_AUTH_TOKEN
+  // Trim to tolerate stray whitespace accidentally saved into the Vercel
+  // env var values (a leading space makes libSQL reject the URL as invalid).
+  const url = process.env.TURSO_DATABASE_URL?.trim()
+  const authToken = process.env.TURSO_AUTH_TOKEN?.trim()
   if (!url || !authToken) {
     throw new Error(
       `Turso env vars missing: ${!url ? 'TURSO_DATABASE_URL ' : ''}${!authToken ? 'TURSO_AUTH_TOKEN' : ''}`.trim(),
