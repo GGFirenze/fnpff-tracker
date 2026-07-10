@@ -118,6 +118,10 @@ function ExpandedDetails({ ticket, onUpdate, onDelete }) {
   const [noteValue, setNoteValue] = useState(ticket.notes || '')
   const [pmEdit, setPmEdit] = useState(false)
   const [pmValue, setPmValue] = useState(ticket.pm_owner || 'None')
+  const [engEdit, setEngEdit] = useState(false)
+  const [engValue, setEngValue] = useState(ticket.engineering_ref || '')
+  const [zdEdit, setZdEdit] = useState(false)
+  const [zdValue, setZdValue] = useState(ticket.zendesk_ticket_id ? String(ticket.zendesk_ticket_id) : '')
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   const saveNote = async () => {
@@ -132,6 +136,25 @@ function ExpandedDetails({ ticket, onUpdate, onDelete }) {
       await onUpdate(ticket.id, 'pm_owner', pmValue, ticket.pm_owner)
     }
     setPmEdit(false)
+  }
+
+  const saveEng = async () => {
+    const next = engValue.trim()
+    if (next !== (ticket.engineering_ref || '')) {
+      await onUpdate(ticket.id, 'engineering_ref', next, ticket.engineering_ref)
+    }
+    setEngEdit(false)
+  }
+
+  const saveZd = async () => {
+    const next = zdValue.trim()
+    const current = ticket.zendesk_ticket_id ? String(ticket.zendesk_ticket_id) : ''
+    if (next !== current) {
+      await onUpdate(ticket.id, 'zendesk_ticket_id', next, ticket.zendesk_ticket_id)
+      const url = next ? `https://amplitude.zendesk.com/agent/tickets/${next}` : ''
+      await onUpdate(ticket.id, 'zendesk_url', url, ticket.zendesk_url)
+    }
+    setZdEdit(false)
   }
 
   const handleDelete = async () => {
@@ -162,20 +185,47 @@ function ExpandedDetails({ ticket, onUpdate, onDelete }) {
             )}
           </div>
         </div>
-        {ticket.engineering_ref && (
-          <DetailRow label="Engineering Ref" value={ticket.engineering_ref} />
-        )}
+        <div className="flex items-center gap-2">
+          <span className="text-gray-500 text-xs font-medium">Engineering Ref:</span>
+          {engEdit ? (
+            <span onClick={e => e.stopPropagation()}>
+              <input type="text" value={engValue} onChange={e => setEngValue(e.target.value)}
+                onBlur={saveEng} onKeyDown={e => { if (e.key === 'Enter') saveEng(); if (e.key === 'Escape') setEngEdit(false) }}
+                placeholder="e.g. MAR-385, CAP-388" className="text-xs border rounded px-2 py-0.5 w-44" autoFocus />
+            </span>
+          ) : (
+            <span className="text-xs cursor-pointer hover:text-blue-600"
+              onClick={e => { e.stopPropagation(); setEngEdit(true) }}>
+              {ticket.engineering_ref
+                ? <EngRefLinks raw={ticket.engineering_ref} ticketId={ticket.id} />
+                : <span className="text-gray-400">Add ref</span>}
+              <span className="text-blue-500 text-[10px] ml-1">edit</span>
+            </span>
+          )}
+        </div>
       </div>
       <div className="space-y-2">
-        <div>
-          <span className="text-gray-500 text-xs font-medium">Zendesk:</span>{' '}
-          {ticket.zendesk_url ? (
-            <a href={ticket.zendesk_url} target="_blank" rel="noopener noreferrer"
-              className="text-blue-600 hover:underline text-xs"
-              onClick={e => { e.stopPropagation(); track('link_clicked', { link_type: 'ticket', ticket_id: ticket.id }) }}>
-              #{ticket.zendesk_ticket_id}
-            </a>
-          ) : '—'}
+        <div className="flex items-center gap-2">
+          <span className="text-gray-500 text-xs font-medium">Zendesk:</span>
+          {zdEdit ? (
+            <span onClick={e => e.stopPropagation()}>
+              <input type="text" value={zdValue} onChange={e => setZdValue(e.target.value)}
+                onBlur={saveZd} onKeyDown={e => { if (e.key === 'Enter') saveZd(); if (e.key === 'Escape') setZdEdit(false) }}
+                placeholder="e.g. 399164" className="text-xs border rounded px-2 py-0.5 w-32" autoFocus />
+            </span>
+          ) : (
+            <span className="text-xs cursor-pointer hover:text-blue-600"
+              onClick={e => { e.stopPropagation(); setZdEdit(true) }}>
+              {ticket.zendesk_url ? (
+                <a href={ticket.zendesk_url} target="_blank" rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                  onClick={e => { e.stopPropagation(); track('link_clicked', { link_type: 'ticket', ticket_id: ticket.id }) }}>
+                  #{ticket.zendesk_ticket_id}
+                </a>
+              ) : <span className="text-gray-400">Add #</span>}
+              <span className="text-blue-500 text-[10px] ml-1">edit</span>
+            </span>
+          )}
         </div>
         <div>
           <div className="flex items-center justify-between">
