@@ -6,11 +6,18 @@ export default function ExportButton({ tickets }) {
   const exportMarkdown = () => {
     const header = '| # | Topic | Type | Priority | Fressnapf | Amplitude | Pillar | Source | Eng Ref | PB Status |'
     const separator = '|---|-------|------|----------|-----------|-----------|--------|--------|---------|-----------|'
-    const source = (t) => t.zendesk_url
-      ? `[ZD #${t.zendesk_ticket_id ?? ''}](${t.zendesk_url})`
-      : ((t.notes || '').match(/https?:\/\/[^\s)]+slack\.com\/[^\s)]+/i)?.[0] ? `[Slack](${(t.notes || '').match(/https?:\/\/[^\s)]+slack\.com\/[^\s)]+/i)[0]})` : '—')
+    const source = (t) => {
+      if (t.zendesk_url) return `[ZD #${t.zendesk_ticket_id ?? ''}](${t.zendesk_url})`
+      const slack = (t.notes || '').match(/https?:\/\/[^\s)]+slack\.com\/[^\s)]+/i)
+      return slack ? `[Slack](${slack[0]})` : '—'
+    }
+    const engRef = (t) => {
+      const refs = String(t.engineering_ref || '').split(/[,\s]+/).map(s => s.trim()).filter(Boolean)
+      if (refs.length === 0) return '—'
+      return refs.map(r => /^[A-Za-z]{2,}-\d+$/.test(r) ? `[${r}](https://linear.app/amplitude/issue/${r})` : r).join(', ')
+    }
     const rows = tickets.map(t =>
-      `| ${t.id} | ${t.topic} | ${t.classification} | ${t.priority || 'Unassigned'} | ${t.fressnapf_status} | ${t.amplitude_status} | ${t.pillar} | ${source(t)} | ${t.engineering_ref || '—'} | ${t.productboard_status} |`
+      `| ${t.id} | ${t.topic} | ${t.classification} | ${t.priority || 'Unassigned'} | ${t.fressnapf_status} | ${t.amplitude_status} | ${t.pillar} | ${source(t)} | ${engRef(t)} | ${t.productboard_status} |`
     )
 
     const markdown = [header, separator, ...rows].join('\n')

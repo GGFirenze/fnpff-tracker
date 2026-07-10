@@ -96,8 +96,8 @@ export default function TicketRow({ ticket, onUpdate, onDelete }) {
             <span className="text-gray-300 text-xs">—</span>
           )}
         </td>
-        <td className="px-3 py-3 text-xs text-gray-600 whitespace-nowrap">
-          {ticket.engineering_ref || <span className="text-gray-300">—</span>}
+        <td className="px-3 py-3 text-xs whitespace-nowrap">
+          <EngRefLinks raw={ticket.engineering_ref} ticketId={ticket.id} />
         </td>
         <td className="px-3 py-3">
           {editing === 'productboard_status' ? (
@@ -239,6 +239,30 @@ function ExpandedDetails({ ticket, onUpdate, onDelete }) {
         </div>
       </div>
     </div>
+  )
+}
+
+const LINEAR_BASE = 'https://linear.app/amplitude/issue/'
+const isLinearKey = (s) => /^[A-Za-z]{2,}-\d+$/.test(s)
+
+function EngRefLinks({ raw, ticketId }) {
+  const refs = String(raw || '').split(/[,\s]+/).map(s => s.trim()).filter(Boolean)
+  if (refs.length === 0) return <span className="text-gray-300">—</span>
+  return (
+    <span className="text-gray-600">
+      {refs.map((ref, i) => (
+        <span key={ref}>
+          {isLinearKey(ref) ? (
+            <a href={LINEAR_BASE + ref} target="_blank" rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+              onClick={e => { e.stopPropagation(); track('link_clicked', { link_type: 'linear', ticket_id: ticketId }) }}>
+              {ref}
+            </a>
+          ) : ref}
+          {i < refs.length - 1 ? ', ' : ''}
+        </span>
+      ))}
+    </span>
   )
 }
 
