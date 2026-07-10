@@ -24,7 +24,7 @@ ONLY_AUTOMATION="no"
 [[ "${1:-}" == "--automation" ]] && ONLY_AUTOMATION="yes"
 
 curl -s -H "Authorization: Bearer ${APP_PASSWORD}" "${FNPFF_API_BASE}/api/audit" \
-  | ONLY_AUTOMATION="$ONLY_AUTOMATION" python3 -c '
+  | ONLY_AUTOMATION="$ONLY_AUTOMATION" python3 <<'PY'
 import sys, json, os
 
 only_auto = os.environ.get("ONLY_AUTOMATION") == "yes"
@@ -44,6 +44,9 @@ print(f"{len(rows)} {label} audit entr" + ("y" if len(rows) == 1 else "ies") + "
 for r in rows[:40]:
     when = r.get("changed_at", "?")
     who = r.get("changed_by", "?")
-    print(f"{when}  #{r.get(\"ticket_id\")}  [{who}]  "
-          f"{r.get(\"field_changed\")}: {r.get(\"old_value\")!r} -> {r.get(\"new_value\")!r}")
-'
+    tid = r.get("ticket_id")
+    field = r.get("field_changed")
+    old = r.get("old_value")
+    new = r.get("new_value")
+    print(f"{when}  #{tid}  [{who}]  {field}: {old!r} -> {new!r}")
+PY
