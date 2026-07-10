@@ -31,6 +31,8 @@ export default function TicketTable({ tickets, onUpdate, onDelete, title, emptyL
     { key: 'fressnapf_status', label: 'Fressnapf', width: 'w-24' },
     { key: 'amplitude_status', label: 'Amplitude', width: 'w-28' },
     { key: 'pillar', label: 'Pillar', width: 'w-28' },
+    { key: 'zendesk_ticket_id', label: 'Source', width: 'w-24' },
+    { key: 'engineering_ref', label: 'Eng Ref', width: 'w-24' },
     { key: 'productboard_status', label: 'PB Status', width: 'w-28' },
   ]
 

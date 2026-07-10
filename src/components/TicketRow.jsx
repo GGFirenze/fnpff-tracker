@@ -6,6 +6,7 @@ export default function TicketRow({ ticket, onUpdate, onDelete }) {
   const [editing, setEditing] = useState(null)
   const [editValue, setEditValue] = useState('')
 
+  const source = getSource(ticket)
   const isMisaligned = ticket.fressnapf_status === 'Open' && ticket.amplitude_status === 'Closed'
   const isOnHold = ticket.amplitude_status === 'On Hold'
   const isResolved = ticket.fressnapf_status === 'Fixed' || ticket.fressnapf_status === 'Done'
@@ -85,6 +86,20 @@ export default function TicketRow({ ticket, onUpdate, onDelete }) {
         </td>
         <td className="px-3 py-3 text-gray-600">{ticket.pillar}</td>
         <td className="px-3 py-3">
+          {source ? (
+            <a href={source.href} target="_blank" rel="noopener noreferrer"
+              className="text-blue-600 hover:underline text-xs whitespace-nowrap"
+              onClick={e => { e.stopPropagation(); track('link_clicked', { link_type: source.type, ticket_id: ticket.id }) }}>
+              {source.label}
+            </a>
+          ) : (
+            <span className="text-gray-300 text-xs">—</span>
+          )}
+        </td>
+        <td className="px-3 py-3 text-xs text-gray-600 whitespace-nowrap">
+          {ticket.engineering_ref || <span className="text-gray-300">—</span>}
+        </td>
+        <td className="px-3 py-3">
           {editing === 'productboard_status' ? (
             <select value={editValue} onChange={e => setEditValue(e.target.value)}
               onBlur={() => saveEdit('productboard_status')} onClick={e => e.stopPropagation()}
@@ -102,7 +117,7 @@ export default function TicketRow({ ticket, onUpdate, onDelete }) {
       </tr>
       {expanded && (
         <tr className={rowColor}>
-          <td colSpan="9" className="px-6 py-4">
+          <td colSpan="11" className="px-6 py-4">
             <ExpandedDetails ticket={ticket} onUpdate={onUpdate} onDelete={onDelete} />
           </td>
         </tr>
@@ -225,6 +240,16 @@ function ExpandedDetails({ ticket, onUpdate, onDelete }) {
       </div>
     </div>
   )
+}
+
+function getSource(ticket) {
+  if (ticket.zendesk_url) {
+    const id = ticket.zendesk_ticket_id ? `ZD #${ticket.zendesk_ticket_id}` : 'Zendesk'
+    return { href: ticket.zendesk_url, label: id, type: 'ticket' }
+  }
+  const slack = (ticket.notes || '').match(/https?:\/\/[^\s)]+slack\.com\/[^\s)]+/i)
+  if (slack) return { href: slack[0], label: 'Slack', type: 'slack' }
+  return null
 }
 
 function DetailRow({ label, value }) {
