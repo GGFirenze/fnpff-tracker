@@ -19,6 +19,7 @@ export default function App() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [view, setView] = useState('fr')
   const [capWarning, setCapWarning] = useState('')
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     if (authed) {
@@ -78,11 +79,18 @@ export default function App() {
     return result
   }, [tickets])
 
+  const q = search.trim().toLowerCase()
   const filteredTickets = tickets.filter(t => {
     if (filters.status.length && !filters.status.includes(t.fressnapf_status)) return false
     if (filters.classification.length && !filters.classification.includes(t.classification)) return false
     if (filters.pillar.length && !filters.pillar.includes(t.pillar)) return false
     if (filters.priority.length && !filters.priority.includes(t.priority || 'Unassigned')) return false
+    if (q) {
+      const haystack = [t.topic, t.summary, t.reporter, t.pillar, t.classification, t.engineering_ref, t.zendesk_ticket_id, t.notes]
+        .map(v => String(v ?? '').toLowerCase())
+        .join(' ')
+      if (!haystack.includes(q)) return false
+    }
     return true
   })
 
@@ -130,6 +138,21 @@ export default function App() {
                 <button onClick={() => setCapWarning('')} className="text-red-400 hover:text-red-600">✕</button>
               </div>
             )}
+            <div className="mb-4 relative">
+              <input
+                type="search"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Search topic, summary, reporter, Zendesk #, Eng ref, notes…"
+                className="w-full rounded-lg border border-gray-300 pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">⌕</span>
+              {q && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+                  {featureRequests.length + bugsAndIssues.length} match{featureRequests.length + bugsAndIssues.length === 1 ? '' : 'es'}
+                </span>
+              )}
+            </div>
             <ViewToggle view={view} setView={setView} frCount={featureRequests.length} bugCount={bugsAndIssues.length} />
             <div className="space-y-6">
               {view !== 'bugs' && (
