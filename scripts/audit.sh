@@ -23,15 +23,21 @@ fi
 ONLY_AUTOMATION="no"
 [[ "${1:-}" == "--automation" ]] && ONLY_AUTOMATION="yes"
 
-curl -s -H "Authorization: Bearer ${APP_PASSWORD}" "${FNPFF_API_BASE}/api/audit" \
-  | ONLY_AUTOMATION="$ONLY_AUTOMATION" python3 <<'PY'
-import sys, json, os
+FNPFF_API_BASE="$FNPFF_API_BASE" APP_PASSWORD="$APP_PASSWORD" \
+ONLY_AUTOMATION="$ONLY_AUTOMATION" python3 <<'PY'
+import sys, json, os, urllib.request
 
+base = os.environ["FNPFF_API_BASE"].rstrip("/")
+pw = os.environ["APP_PASSWORD"]
 only_auto = os.environ.get("ONLY_AUTOMATION") == "yes"
+
 try:
-    rows = json.load(sys.stdin)
-except Exception:
-    print("Could not parse audit response (API down or empty?).")
+    req = urllib.request.Request(base + "/api/audit")
+    req.add_header("Authorization", f"Bearer {pw}")
+    with urllib.request.urlopen(req, timeout=30) as r:
+        rows = json.loads(r.read().decode())
+except Exception as e:
+    print(f"Could not fetch audit log: {e}")
     sys.exit(1)
 
 if only_auto:
