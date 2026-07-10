@@ -4,8 +4,8 @@ export default function ExportButton({ tickets }) {
   const [copied, setCopied] = useState(false)
 
   const exportMarkdown = () => {
-    const header = '| # | Topic | Type | Priority | Fressnapf | Amplitude | Pillar | Source | Eng Ref | PB Status |'
-    const separator = '|---|-------|------|----------|-----------|-----------|--------|--------|---------|-----------|'
+    const header = '| # | Topic | Type | Priority | Fressnapf | Amplitude | Pillar | Source | Eng Ref |'
+    const separator = '|---|-------|------|----------|-----------|-----------|--------|--------|---------|'
     const source = (t) => {
       if (t.zendesk_url) return `[ZD #${t.zendesk_ticket_id ?? ''}](${t.zendesk_url})`
       const slack = (t.notes || '').match(/https?:\/\/[^\s)]+slack\.com\/[^\s)]+/i)
@@ -17,7 +17,7 @@ export default function ExportButton({ tickets }) {
       return refs.map(r => /^[A-Za-z]{2,}-\d+$/.test(r) ? `[${r}](https://linear.app/amplitude/issue/${r})` : r).join(', ')
     }
     const rows = tickets.map(t =>
-      `| ${t.id} | ${t.topic} | ${t.classification} | ${t.priority || 'Unassigned'} | ${t.fressnapf_status} | ${t.amplitude_status} | ${t.pillar} | ${source(t)} | ${engRef(t)} | ${t.productboard_status} |`
+      `| ${t.id} | ${t.topic} | ${t.classification} | ${t.priority || 'Unassigned'} | ${t.fressnapf_status} | ${t.amplitude_status} | ${t.pillar} | ${source(t)} | ${engRef(t)} |`
     )
 
     const markdown = [header, separator, ...rows].join('\n')

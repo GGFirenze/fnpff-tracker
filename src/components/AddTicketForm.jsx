@@ -9,9 +9,6 @@ export default function AddTicketForm({ onSubmit, onClose }) {
     amplitude_status: 'Unprocessed',
     zendesk_ticket_id: '',
     zendesk_url: '',
-    productboard_note_id: '',
-    productboard_url: '',
-    productboard_status: 'Not Logged',
     pm_owner: 'None',
     pillar: 'Governance',
     reporter: '',
@@ -35,9 +32,6 @@ export default function AddTicketForm({ onSubmit, onClose }) {
       ...form,
       zendesk_url: form.zendesk_ticket_id
         ? `https://gethelp.amplitude.com/hc/requests/${form.zendesk_ticket_id}`
-        : '',
-      productboard_url: form.productboard_note_id
-        ? `https://app.productboard.com/notes/${form.productboard_note_id}`
         : '',
       created_date: new Date().toISOString().split('T')[0],
     })
@@ -78,16 +72,10 @@ export default function AddTicketForm({ onSubmit, onClose }) {
               onChange={v => handleChange('amplitude_status', v)} />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <SelectField label="PB Status" value={form.productboard_status}
-              options={['Not Logged', 'Unprocessed', 'Processed']}
-              onChange={v => handleChange('productboard_status', v)} />
-            <Field label="PM Owner" value={form.pm_owner} onChange={v => handleChange('pm_owner', v)} />
-          </div>
+          <Field label="PM Owner" value={form.pm_owner} onChange={v => handleChange('pm_owner', v)} />
 
           <Field label="Reporter" value={form.reporter} onChange={v => handleChange('reporter', v)} />
           <Field label="Zendesk Ticket ID" value={form.zendesk_ticket_id} onChange={v => handleChange('zendesk_ticket_id', v)} placeholder="e.g. 394661" />
-          <Field label="Productboard Note ID" value={form.productboard_note_id} onChange={v => handleChange('productboard_note_id', v)} placeholder="e.g. 51713875" />
           <Field label="Engineering Ref" value={form.engineering_ref} onChange={v => handleChange('engineering_ref', v)} placeholder="e.g. AMP-148857, CAP-388" />
           <Field label="Notes" value={form.notes} onChange={v => handleChange('notes', v)} textarea />
 

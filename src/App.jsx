@@ -13,7 +13,7 @@ import { SEED_TICKETS, MAX_P0, sectionOf, SECTION_LABEL } from './lib/data'
 export default function App() {
   const [authed, setAuthed] = useState(() => sessionStorage.getItem('fressnapf-auth') === 'true')
   const [tickets, setTickets] = useState(SEED_TICKETS)
-  const [filters, setFilters] = useState({ status: [], classification: [], pillar: [], pbStatus: [], priority: [] })
+  const [filters, setFilters] = useState({ status: [], classification: [], pillar: [], priority: [] })
   const [loading, setLoading] = useState(true)
   const [auditRefresh, setAuditRefresh] = useState(0)
   const [showAddForm, setShowAddForm] = useState(false)
@@ -82,7 +82,6 @@ export default function App() {
     if (filters.status.length && !filters.status.includes(t.fressnapf_status)) return false
     if (filters.classification.length && !filters.classification.includes(t.classification)) return false
     if (filters.pillar.length && !filters.pillar.includes(t.pillar)) return false
-    if (filters.pbStatus.length && !filters.pbStatus.includes(t.productboard_status)) return false
     if (filters.priority.length && !filters.priority.includes(t.priority || 'Unassigned')) return false
     return true
   })

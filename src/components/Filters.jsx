@@ -4,7 +4,6 @@ export default function Filters({ filters, setFilters }) {
   const statusOptions = ['Open', 'Fixed', 'Done']
   const classificationOptions = ['Bug', 'FR', 'Product limitation']
   const pillarOptions = ['Governance', 'Analytics', 'Data Management']
-  const pbStatusOptions = ['Unprocessed', 'Processed', 'Not Logged']
   const priorityOptions = ['P0', 'P1', 'P2', 'P3', 'Unassigned']
 
   const toggleFilter = (category, value) => {
@@ -19,7 +18,7 @@ export default function Filters({ filters, setFilters }) {
   }
 
   const clearAll = () => {
-    setFilters({ status: [], classification: [], pillar: [], pbStatus: [], priority: [] })
+    setFilters({ status: [], classification: [], pillar: [], priority: [] })
   }
 
   const hasFilters = Object.values(filters).some(arr => arr.length > 0)
@@ -37,7 +36,7 @@ export default function Filters({ filters, setFilters }) {
           </button>
         )}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <FilterGroup
           label="Priority"
           options={priorityOptions}
@@ -61,12 +60,6 @@ export default function Filters({ filters, setFilters }) {
           options={pillarOptions}
           selected={filters.pillar}
           onToggle={(val) => toggleFilter('pillar', val)}
-        />
-        <FilterGroup
-          label="Productboard Status"
-          options={pbStatusOptions}
-          selected={filters.pbStatus}
-          onToggle={(val) => toggleFilter('pbStatus', val)}
         />
       </div>
     </div>

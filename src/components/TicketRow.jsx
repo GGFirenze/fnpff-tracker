@@ -34,7 +34,6 @@ export default function TicketRow({ ticket, onUpdate, onDelete }) {
 
   const statusOptions = ['Open', 'Fixed', 'Done']
   const amplitudeStatusOptions = ['Unprocessed', 'In Engineering', 'On Hold', 'Closed', 'Resolved', 'Open']
-  const pbStatusOptions = ['Not Logged', 'Unprocessed', 'Processed']
   const priorityOptions = ['P0', 'P1', 'P2', 'P3', 'Unassigned']
 
   return (
@@ -99,25 +98,13 @@ export default function TicketRow({ ticket, onUpdate, onDelete }) {
         <td className="px-3 py-3 text-xs whitespace-nowrap">
           <EngRefLinks raw={ticket.engineering_ref} ticketId={ticket.id} />
         </td>
-        <td className="px-3 py-3">
-          {editing === 'productboard_status' ? (
-            <select value={editValue} onChange={e => setEditValue(e.target.value)}
-              onBlur={() => saveEdit('productboard_status')} onClick={e => e.stopPropagation()}
-              className="text-xs border rounded px-1 py-0.5" autoFocus>
-              {pbStatusOptions.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-          ) : (
-            <PbStatusBadge value={ticket.productboard_status}
-              onClick={e => startEdit('productboard_status', ticket.productboard_status, e)} editable />
-          )}
-        </td>
         <td className="px-3 py-3 text-gray-400">
           {expanded ? '▲' : '▼'}
         </td>
       </tr>
       {expanded && (
         <tr className={rowColor}>
-          <td colSpan="11" className="px-6 py-4">
+          <td colSpan="10" className="px-6 py-4">
             <ExpandedDetails ticket={ticket} onUpdate={onUpdate} onDelete={onDelete} />
           </td>
         </tr>
@@ -189,16 +176,6 @@ function ExpandedDetails({ ticket, onUpdate, onDelete }) {
               #{ticket.zendesk_ticket_id}
             </a>
           ) : '—'}
-        </div>
-        <div>
-          <span className="text-gray-500 text-xs font-medium">Productboard:</span>{' '}
-          {ticket.productboard_url ? (
-            <a href={ticket.productboard_url} target="_blank" rel="noopener noreferrer"
-              className="text-blue-600 hover:underline text-xs"
-              onClick={e => { e.stopPropagation(); track('link_clicked', { link_type: 'PB', ticket_id: ticket.id }) }}>
-              Note {ticket.productboard_note_id}
-            </a>
-          ) : <span className="text-gray-400 text-xs">Not logged</span>}
         </div>
         <div>
           <div className="flex items-center justify-between">
@@ -339,21 +316,3 @@ function StatusBadge({ value, onClick, editable }) {
   )
 }
 
-function PbStatusBadge({ value, onClick, editable }) {
-  const colors = {
-    'Unprocessed': 'bg-orange-100 text-orange-700',
-    'Processed': 'bg-green-100 text-green-700',
-    'Not Logged': 'bg-gray-100 text-gray-500',
-  }
-  const displayLabels = {
-    'Unprocessed': 'Under review',
-    'Not Logged': 'Pending',
-    'Processed': 'Processed',
-  }
-  return (
-    <span onClick={editable ? onClick : undefined}
-      className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors[value] || 'bg-gray-100 text-gray-600'} ${editable ? 'cursor-pointer hover:ring-2 hover:ring-blue-300' : ''}`}>
-      {displayLabels[value] || value}
-    </span>
-  )
-}
