@@ -151,7 +151,7 @@ function ExpandedDetails({ ticket, onUpdate, onDelete }) {
     const current = ticket.zendesk_ticket_id ? String(ticket.zendesk_ticket_id) : ''
     if (next !== current) {
       await onUpdate(ticket.id, 'zendesk_ticket_id', next, ticket.zendesk_ticket_id)
-      const url = next ? `https://amplitude.zendesk.com/agent/tickets/${next}` : ''
+      const url = next ? `https://gethelp.amplitude.com/hc/requests/${next}` : ''
       await onUpdate(ticket.id, 'zendesk_url', url, ticket.zendesk_url)
     }
     setZdEdit(false)
